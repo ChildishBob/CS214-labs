@@ -1,0 +1,255 @@
+\documentclass[12pt,a4paper]{article}
+\usepackage{ctex}
+\usepackage{amsmath,amscd,amsbsy,amssymb,latexsym,url,bm,amsthm}
+\usepackage{epsfig,graphicx,subfigure}
+\usepackage{enumitem,balance}
+\usepackage{wrapfig}
+\usepackage{mathrsfs,euscript}
+\usepackage[usenames]{xcolor}
+\usepackage{hyperref}
+\usepackage[vlined,ruled,linesnumbered]{algorithm2e}
+\hypersetup{colorlinks=true,linkcolor=black}
+
+\newtheorem{theorem}{Theorem}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{exercise}{Exercise}
+\newtheorem*{solution}{Solution}
+\newtheorem{definition}{Definition}
+\theoremstyle{definition}
+
+\renewcommand{\thefootnote}{\fnsymbol{footnote}}
+
+\newcommand{\postscript}[2]
+ {\setlength{\epsfxsize}{#2\hsize}
+  \centerline{\epsfbox{#1}}}
+
+\renewcommand{\baselinestretch}{1.0}
+
+\setlength{\oddsidemargin}{-0.365in}
+\setlength{\evensidemargin}{-0.365in}
+\setlength{\topmargin}{-0.3in}
+\setlength{\headheight}{0in}
+\setlength{\headsep}{0in}
+\setlength{\textheight}{10.1in}
+\setlength{\textwidth}{7in}
+\makeatletter \renewenvironment{proof}[1][Proof] {\par\pushQED{\qed}\normalfont\topsep6\p@\@plus6\p@\relax\trivlist\item[\hskip\labelsep\bfseries#1\@addpunct{.}]\ignorespaces}{\popQED\endtrivlist\@endpefalse} \makeatother
+\makeatletter
+\renewenvironment{solution}[1][Solution] {\par\pushQED{\qed}\normalfont\topsep6\p@\@plus6\p@\relax\trivlist\item[\hskip\labelsep\bfseries#1\@addpunct{.}]\ignorespaces}{\popQED\endtrivlist\@endpefalse} \makeatother
+
+\begin{document}
+
+\noindent
+
+%========================================================================
+\noindent\framebox[\linewidth]{\shortstack[c]{
+\Large{\textbf{Lab04-Matroid}}\vspace{1mm}\\
+CS214-Algorithm and Complexity, Xiaofeng Gao, Spring 2020.}}
+\begin{center}
+\footnotesize{\color{red}$*$ If there is any problem, please contact TA Yiming Liu.}
+
+% Please write down your name, student id and email.
+\footnotesize{\color{blue}$*$ Name: Futao Wei  \quad Student ID: 518021910750 \quad Email: weifutao@sjtu.edu.cn}
+\end{center}
+
+\begin{enumerate}
+\item Give a directed graph $G=(V,E)$ whose edges have integer weights. Let $w(e)$ be the weight of edge $e\in E$. We are also given a constraint $f(u)\geq 0$ on the out-degree of each node $u\in V$. Our goal is to find a subset of edges with maximal weight, whose out-degree at any node is no greater than the constraint.
+	\begin{enumerate}
+	    \item Please define independent sets and prove that they form a matroid.
+	    \item Write an optimal greedy algorithm based on Greedy-MAX in the form of \emph{pseudo code}.
+	    \item Analyze the time complexity of your algorithm.
+	\end{enumerate}
+	\begin{solution}
+		\hfill
+		\begin{enumerate}[label = (\alph*)]
+			\item 
+			\textbf{Independent:} A set of edges is independent if the out-degree at any node $u$ of the edges in the set is no greater than $f(u)$. Denote $\mathbf{C}$ as:  \[\mathbf{C} = \{F \subseteq E \mid F \text{ is a set of edges satisfying the out-degree constraint} \}\]
+			To prove that the independent system $(E, \mathbf{C})$ forms a matroid: 
+			\begin{itemize}
+				\item 
+				Hereditary property: Given any $F \in \mathbf{C}$ and $P \subseteq F$, $P$ must satisfy the out-degree constraint, that is, $P \in \mathbf{C}$.
+				\item
+				Exchange property: Given $A, B \in \mathbf{C}$ and $| A | < | B |$, it's obvious that 
+				\[\exists x \in E \text{ such that } x \in B \backslash A \]
+				%For contradiction, suppose that 
+				%\[\forall x \in B \backslash A , \, A \cup x \notin \mathbf{C}\]
+				There are two cases about edge $x$: \\
+				% \text{Case 1:} Neither nodes of $x$ are in $A$. In this case, $A \cup \{x\} \in \mathbf{C}$. \\
+				\text{Case 1:} The start node of $x$ is not in $A$.  In this case, $A \cup \{x\} \in \mathbf{C}$. \\
+				\text{Case 2:} The start node of $x$ is in $A$. Denote it as $s$. In this case, i. $A \cup \{x\} \in \mathbf{C}$ if the out-degree of $s$ in $A$ is less than $f(s)$. ii. $A \cup \{x\} \notin \mathbf{C}$ if the out-degree of $s$ in $A$ is equal to $f(s)$. \\
+				We'll prove by contradiction that the ii situation in Case 2 cannot hold for every $x$. If so, we'll arrive at $| A | = | B |$! Thus we've prove the exchange property.
+			\end{itemize}
+			\item 
+			\begin{minipage}[t]{0.9\textwidth}
+				\begin{algorithm}[H]
+					\caption{Greedy-MAX}
+					
+					Sort edges in $E$ into ordering $w(e_1) \geq w(e_2) \geq \cdots \geq w(e_m)$\;
+					$A \leftarrow \emptyset$\;
+					\For{$i = 1 \, \KwTo \, m$}{
+						\If{$A \cup \{e_i\} \in \mathbf{C}$}{
+							$A \leftarrow A \cup \{e_i\}$\;
+						}
+					}
+					output $A$\;
+				\end{algorithm}
+			\end{minipage}
+			\item
+			Sorting: $O(m \log m)$. Checking: $O(m)$. \\
+			Thus, Greedy-MAX algorithm takes $O(m \log m)$ time.
+		\end{enumerate}
+	\end{solution}
+
+
+\item Let $X$, $Y$, $Z$ be three sets. We say two triples $\left(x_{1}, y_{1}, z_{1}\right)$ and $\left(x_{2}, y_{2}, z_{2}\right)$ in $X \times Y \times Z$ are \textit{disjoint} if $x_{1} \neq x_{2}$, $y_{1} \neq y_{2},$ and $z_{1} \neq z_{2}$. Consider the following problem:
+    
+    \begin{definition}[MAX-3DM] 
+        Given three disjoint sets $X$, $Y$, $Z$ and a nonnegative weight function $c(\cdot)$ on all triples in $X \times Y \times Z$, \textbf{Maximum 3-Dimensional Matching} (MAX-3DM) is to find a collection $\mathcal{F}$ of disjoint triples with maximum total weight.
+    \end{definition}
+
+    \begin{enumerate}
+    	\item Let $D = X \times Y \times Z$. Define independent sets for MAX-3DM.
+    	\item Write a greedy algorithm based on Greedy-MAX in the form of \emph{pseudo code}. \label{Item-Greedy}
+    	\item Give a counterexample to show that your Greedy-MAX algorithm in Q.~\ref{Item-Greedy} is not optimal.
+    	\item Show that: $\max\limits_{F \subseteq D} \frac{v(F)}{u(F)} \leq 3$. {\color{blue}(Hint: you may need Theorem~\ref{Thm-Intersect} for this subquestion.)} 
+    \end{enumerate}
+    \begin{theorem} \label{Thm-Intersect}
+        Suppose an independent system $(E, \mathcal{I})$ is the intersection of $k$ matroids $\left(E, \mathcal{I}_{i}\right)$, $1 \leq i \leq k$; that is, $\mathcal{I}=\bigcap_{i=1}^{k} \mathcal{I}_{i}$. Then $\max\limits_{F \subseteq E} \frac{v(F)}{u(F)} \leq k$, where $v(F)$ is the maximum size of independent subset in $F$ and $u(F)$ is the minimum size of maximal independent subset in $F$.
+    \end{theorem}
+ 	\begin{solution}
+ 		\hfill
+ 		\begin{enumerate}[label = (\alph*)]
+ 			\item 
+ 			Define $\mathbf{C}$ as 
+ 			\[\mathbf{C} = \{F \subseteq D \mid \text{any two triples in } F \text{ are disjoint}\}\]
+ 			Then $(D, \mathbf{C})$ is an independent system. Proof of hereditary property: \\
+ 			Given $A \subseteq B, B \in \mathbf{C}$, it's obvious that $A \in \mathbf{C}$, since removing some triples from $B$ will not generate joint triples. 
+ 			\item
+ 			Denote $| X | = p, | Y | = q, | Z | = r$. \\
+ 			\begin{minipage}[t]{0.9\textwidth}
+ 				\begin{algorithm}[H]
+ 					\caption{Greedy-MAX}
+ 					Sort triples in $D$ into ordering $c(d_1) \geq c(d_2) \geq \cdots \geq c(d_{pqr})$\;
+ 					$A \leftarrow \emptyset$\;
+ 					\For{$i = 1 \, \KwTo \, pqr$}{
+ 						\If{$A \cup \{d_i\} \in \mathbf{C}$}{
+ 							$A \leftarrow A \cup \{d_i\}$\;
+ 						}
+ 					}
+ 					output $A$\;
+ 				\end{algorithm}
+ 			\end{minipage}
+ 			\item
+ 			$X = Y = Z = \{1, 2\}$. $c((1, 1, 1)) = 5, c((1, 2, 2)) = 4, c((2, 1, 1)) = 3$, all other triples have weight $0$. \\
+ 			In this case, Greedy-MAX algorithm ends up with $A = \{(1, 1, 1), (2, 2, 2)\}$ with a total weight $5$. However, the optimal choice is $A = \{(1, 2, 2), (2, 1, 1)\}$ with a total weight $7$.
+ 			\item
+ 			Define $\mathbf{C_i}, i=1,2,3$ as
+ 			\[\mathbf{C_i} = \{F \subseteq D \mid \text{the } i \text{-th elements of  triples in } F \text{ are different from one another}\}\]
+ 			Let's prove that $(D, \mathbf{C_i}), i=1,2,3$ is a matroid. 
+ 			\begin{itemize}
+ 				\item 
+ 				Hereditary property: Same as the proof in (a).
+ 				\item 
+ 				Exchange property: Given $A, B \in \mathbf{C_i}$ and $| A | < | B |$, it's obvious that 
+ 				\[\exists d \in B \backslash A \text{ such that } A \cup \{d\} \in \mathbf{C_i}\]
+ 				since there must exist a triple in $B$ whose the $i$-th element is different from those of all the triples in $A$.
+ 			\end{itemize}
+ 			Since $(D, \mathbf{C})$ is the intersection of $3$ matroids $(D, \mathbf{C_i}), i=1,2,3$, we have $\max\limits_{F \subseteq D} \frac{v(F)}{u(F)} \leq 3$ according to Theorem \ref{Thm-Intersect}.
+ 		\end{enumerate}
+ 	\end{solution}
+
+
+
+	\item
+	\textbf{Crowdsourcing} is the process of obtaining needed services, ideas, or content by soliciting contributions from a large group of people, especially an online community. Suppose you want to form a team to complete a crowdsourcing task, and there are $n$ individuals to choose from. Each person $p_i$ can contribute $v_i$ ($v_i > 0$) to the team, but he/she can only work with up to $c_i$ other people. Now it is up to you to choose a certain group of people and maximize their total contributions ($\sum_i{v_i}$).
+	
+	\begin{enumerate}
+		\item Given $\text{OPT}(i, b, c)=$ maximum contributions when choosing from $\{p_1, p_2, \cdots, p_i\}$ with $b$ persons from $\{p_{i+1}, p_{i+2}, \cdots, p_n\}$ already on board and at most $c$ seats left before any of the existing team members gets uncomfortable. Describe the optimal substructure as we did in class and write a recurrence for $\text{OPT}(i, b, c)$.
+		\item Design an algorithm to form your team using dynamic programming, in the form of \emph{pseudo code}.
+        \item Analyze the time and space complexities of your design.
+	\end{enumerate}
+	\begin{solution}
+		\hfill
+		\begin{enumerate}[label = (\alph*)]
+			\item 
+			Optimal substructure: \\
+			Case 1: OPT selects $p_i$. 
+			\begin{itemize}
+				\item 
+				collect contribution $v_i$
+				\item
+				the number of seats left decreases
+				\item
+				must include optimal solution to problem consisting of remaining $i-1$ people
+			\end{itemize}
+			Case 2: OPT does not select $p_i$.
+			\begin{itemize}
+				\item 
+				must include optimal solution to problem consisting of remaining $i-1$ people
+			\end{itemize}
+			Recurrence:
+			\[
+				OPT(i, b, c) = 
+				\begin{cases}
+					0, & i = 0 \text{ or } c = 0\\
+					OPT(i-1, b, c), & i > 0 \text{ and } c > 0 \text{ and } c_i < b \\
+					\max \{v_i + OPT(i-1, b+1, \min \{c-1, c_i - b\}), & \\
+					\quad \quad \quad OPT(i-1, b, c)\}, & otherwise
+				\end{cases}
+			\]
+			\item
+			\begin{minipage}[t]{0.9\textwidth}
+				\begin{algorithm}[H]
+					\caption{Memorization}
+					\For{$b = 0 \, \KwTo \, n$}{
+						\For{$c = 0 \, \KwTo \, n$}{
+							$M[0, b, c] = 0$\;
+						}
+					}
+					\For{$i = 0 \, \KwTo \, n$}{
+						\For{$b = 0 \, \KwTo \, n$}{
+							$M[i, b, 0] = 0$\;
+						}
+					}
+					\For{$i = 1 \, \KwTo \, n$}{
+						\For{$b = 0 \, \KwTo \, n$}{
+							\For{$c = 1 \, \KwTo \, n$}{
+								\If{$c_i < b$}{
+									$M[i, b, c] = M[i-1, b, c]$\;
+								}
+								\Else{
+									$M[i, b, c] = \max \{v_i + M[i-1, b+1, \min \{c-1, c_i - b\}], M[i-1, b, c]\}$\;
+								}
+							}
+						}
+					}
+					\textbf{return} $M[n, 0, n]$\;
+				\end{algorithm}
+				\begin{algorithm}[H]
+					\caption{Find-Solution$(j, b, c)$}
+					
+					\If{$j = 0$ \textbf{or} $c = 0$}{
+						\textbf{return} $\emptyset$\;
+					}
+					\If{$v_j + M[j-1, b+1, \min \{c-1, c_j - b\}] \geq M[j-1, b, c]$}{
+						\textbf{return} $\{p_j\} \cup Find-Solution(j-1, b+1, \min \{c-1, c_j - b\})$\;
+					}
+					\Else{
+						\textbf{return} $Find-Solution(j-1, b, c)$\;
+					}
+				\end{algorithm}
+			\end{minipage}
+			\item
+			Time complexity: $O(n^3) + O(n) = O(n^3)$. \\
+			Space complexity: $O(n^3)$.
+		\end{enumerate}
+	\end{solution}
+\end{enumerate}
+
+\vspace{20pt}
+
+\textbf{Remark:} You need to include your .pdf and .tex files in your uploaded .rar or .zip file.
+
+%========================================================================
+\end{document}

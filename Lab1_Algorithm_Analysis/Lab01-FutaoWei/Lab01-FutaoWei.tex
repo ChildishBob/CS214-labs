@@ -1,0 +1,251 @@
+\documentclass[12pt,a4paper]{article}
+\usepackage{ctex}
+\usepackage{amsmath,amscd,amsbsy,amssymb,latexsym,url,bm,amsthm}
+\usepackage{epsfig,graphicx,subfigure}
+\usepackage{enumitem,balance}
+\usepackage{wrapfig}
+\usepackage{mathrsfs,euscript}
+\usepackage[usenames]{xcolor}
+\usepackage{hyperref}
+\usepackage[vlined,ruled,linesnumbered]{algorithm2e}
+\hypersetup{colorlinks=true,linkcolor=black}
+
+\newtheorem{theorem}{Theorem}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{exercise}{Exercise}
+\newtheorem*{solution}{Solution}
+\newtheorem{definition}{Definition}
+\theoremstyle{definition}
+
+\renewcommand{\thefootnote}{\fnsymbol{footnote}}
+
+\newcommand{\postscript}[2]
+ {\setlength{\epsfxsize}{#2\hsize}
+  \centerline{\epsfbox{#1}}}
+
+\renewcommand{\baselinestretch}{1.0}
+
+\setlength{\oddsidemargin}{-0.365in}
+\setlength{\evensidemargin}{-0.365in}
+\setlength{\topmargin}{-0.3in}
+\setlength{\headheight}{0in}
+\setlength{\headsep}{0in}
+\setlength{\textheight}{10.1in}
+\setlength{\textwidth}{7in}
+\makeatletter \renewenvironment{proof}[1][Proof] {\par\pushQED{\qed}\normalfont\topsep6\p@\@plus6\p@\relax\trivlist\item[\hskip\labelsep\bfseries#1\@addpunct{.}]\ignorespaces}{\popQED\endtrivlist\@endpefalse} \makeatother
+\makeatletter
+\renewenvironment{solution}[1][Solution] {\par\pushQED{\qed}\normalfont\topsep6\p@\@plus6\p@\relax\trivlist\item[\hskip\labelsep\bfseries#1\@addpunct{.}]\ignorespaces}{\popQED\endtrivlist\@endpefalse} \makeatother
+
+\begin{document}
+\noindent
+
+%========================================================================
+\noindent\framebox[\linewidth]{\shortstack[c]{
+\Large{\textbf{Lab01-AlgorithmAnalysis}}\vspace{1mm}\\
+CS214-Algorithm and Complexity, Xiaofeng Gao, Spring 2020.}}
+\begin{center}
+\footnotesize{\color{red}$*$ If there is any problem, please contact TA Shuodian Yu.}
+
+% Please write down your name, student id and email.
+\footnotesize{\color{blue}$*$ Name: Futao Wei \quad Student ID: 518021910750 \quad Email: weifutao@sjtu.edu.cn}
+\end{center}
+
+\begin{enumerate}
+    \item
+    Please analyze the time complexity of Alg.~\ref{Alg-PSUM} with brief explanations.
+
+    \begin{minipage}[t]{0.8\textwidth}
+    \begin{algorithm}[H]
+        \caption{PSUM}\label{Alg-PSUM}
+        \KwIn{$n=k^2$, $k$ is a positive integer.}
+        \KwOut{$\sum_{i=1}^j i$ for each perfect square $j$ between 1 and $n$.}
+
+        \BlankLine
+
+        $k \leftarrow \sqrt{n}$\;
+
+        \For{$j\leftarrow 1$ {\bf to} $k$}{
+            $sum[j]\leftarrow 0$\;
+            \For{$i \leftarrow 1$ {\bf to} $j^2$}{
+                $sum[j]\leftarrow sum[j]+i$\;
+            }
+        }
+
+        {\bf return} $sum[1\cdots k]$\;
+    \end{algorithm}
+	\begin{solution}
+		\hfill \break
+		$\Theta(n^{\frac{3}{2}})$. The outer loop iterates $k$ times and the inner loop iterates $j^2$ times. Hence we have 
+		\begin{align*}
+			\text{total  addition} & \sim \sum_{j = 1}^{k} j^2 \\
+			& = \frac{k(k + 1)(2k + 1)}{6} \\
+			& \sim k^3 \\
+			& = n^{\frac{3}{2}}
+		\end{align*}
+		
+	\end{solution}
+    \end{minipage}
+
+    \item
+    Analyze the \textbf{average} time complexity of QuickSort in Alg.~\ref{Alg_Quick}.
+
+    \begin{minipage}[t]{0.8\textwidth}
+    \begin{algorithm}[H]
+      \KwIn{An array $A[1,\cdots,n]$}
+      \KwOut{$A[1,\cdots,n]$ sorted nonincreasingly}
+
+      \BlankLine
+      \caption{QuickSort}\label{Alg_Quick}
+
+      %\If{$n \le 1$}{
+      %  \Return\;
+      %}
+
+      $pivot \leftarrow A[n]$; $i \leftarrow 1$\;
+      \For{$j \leftarrow 1$ \KwTo $n-1$}{
+        \If{$A[j] < pivot$}{
+          swap $A[i]$ and $A[j]$\;
+          $i \leftarrow i+1$\;
+        }
+      }
+
+      swap $A[i]$ and $A[n]$\;
+      \lIf{$i>1$}{$\operatorname{QuickSort}(A[1,\cdots,i-1])$}
+      \lIf{$i<n$}{$\operatorname{QuickSort}(A[i+1,\cdots,n])$}
+    \end{algorithm}
+    \end{minipage}
+
+    \begin{solution}
+        \hfill \break
+        $O(n \log n)$. \\
+        Let $T_n$ be the expected number of comparisons. $T_0 = 0$, $T_1 = 1$. \\
+        Assume that the position where the pivot settles down is uniformly distributed, i.e., the pivot stops at position $1,\cdots,n$ with the same probability $\frac{1}{n}$. \\
+        As the recursion indicates, we have
+        \[
+        	T_n = \sum_{i = 1}^{n} \frac{1}{n}(T_{i - 1} + T_{n - i} + n)
+        	= n + \frac{2}{n} \sum_{i = 0}^{n - 1} T_i
+        	= n + \frac{2}{n} \sum_{i = 1}^{n - 1} T_i
+        \]
+        Denote $\sum_{i = 1}^{n} T_i$ as $S_n$, we have
+        \begin{equation} \label{n}
+        	T_n = n + \frac{2}{n} S_{n - 1}
+        \end{equation}
+        \begin{equation} \label{n - 1}
+	        T_{n - 1} = n - 1 + \frac{2}{n - 1} S_{n - 2}
+        \end{equation}
+        $(\ref{n}) \times n - (\ref{n - 1}) \times (n - 1)$ results in
+        \begin{align} 
+	        nT_n - (n - 1)T_{n - 1} & = n^2 - (n - 1)^2 + 2(S_{n - 1} - S_{n - 2}) \\ \label{relation}
+	        & = 2n - 1 + 2T_{n - 1}
+        \end{align}
+        With $(\ref{relation})$ we have
+        \begin{equation}
+        	\frac{T_n}{n + 1} - \frac{T_{n - 1}}{n} = \frac{3}{n + 1} - \frac{1}{n}
+        \end{equation}
+        Then we can obtain $T_n$ by unfolding
+        \begin{align}
+	        \frac{T_n}{n + 1} - \frac{T_1}{2} & = 2(\frac{1}{3} + \frac{1}{4} + \cdots + \frac{1}{n}) + \frac{3}{n + 1} - \frac{1}{2} \\
+	        T_n & = 2(n + 1)(\frac{1}{3} + \frac{1}{4} + \cdots + \frac{1}{n}) + 3 \sim n \log n
+        \end{align}
+        Therefore, the average time complexity of QuickSort is $O(n \log n)$. 
+        
+        
+        	
+        
+    \end{solution}
+
+    \item
+    The BubbleSort mentioned in class can be improved by stopping in time if there are no swaps during an iteration. An indicator is used thereby to check whether the array is already sorted. Analyze the \textbf{average} and \textbf{best} time complexity of the improved BubbleSort in Alg.~\ref{Alg_Bubble}.
+
+    \begin{minipage}[t]{0.8\textwidth}
+    \begin{algorithm}[H]
+        \KwIn{An array $A[1,\dots,n]$}
+        \KwOut{$A[1,\dots,n]$ sorted nondecreasingly}
+
+        \BlankLine
+        \caption{BubbleSort}\label{Alg_Bubble}
+
+        $i\leftarrow 1$;$sorted\leftarrow false$\;
+
+        \While{$i\leq n-1$ \textbf{and not} $sorted$}{
+            $sorted\leftarrow true$\;
+            \For{$j\leftarrow n $ \textbf{downto} $i+1$}{
+                \If{$A[j]<A[j-1]$}{
+                    interchange $A[j]$ and $A[j-1]$\;
+                    $sorted\leftarrow false$\;
+                }
+            }
+            $i\leftarrow i+1$\;
+        }
+    \end{algorithm}
+    \end{minipage}
+
+    \begin{solution}
+    	\hfill \break
+    	
+        \textbf{Best Case:} $\Omega(n)$. \\
+        The best case happens when the array is already sorted. \\
+        \textbf{Average Case:} $O(n^2)$. \\
+        For average case analysis, \[\text{comparison times} \sim n + \text{inversion number}\](a pair ($A[i], A[j]$) is inverted if $i<j$ and $A[i] > A[j]$). \\
+        There are $C_{n}^{2} = \frac{n(n - 1)}{2}$ pairs in $A[1,\dots,n]$. In average, half of them will be inversions, i.e., $$E(\text{inversion number}) = \frac{n(n - 1)}{4}$$. Hence we have
+        \begin{align*}
+        	E(\text{comparison times}) & \sim n + \frac{n(n - 1)}{4} \\
+        	& \sim n^2
+        \end{align*}
+    \end{solution}
+
+    \item
+
+    Rank the following functions by order of growth with brief explanations: that is, find an arrangement $g_1, g_2, \ldots , g_{15}$ of the functions $g_1 = \Omega(g_2), g_2 = \Omega(g_3), \ldots, g_{14} = \Omega(g_{15})$.  Partition your list into equivalence classes such that functions $f(n)$ and $g(n)$ are in the same class if and only if $f(n) = \Theta(g(n))$. Use symbols ``$=$'' and ``$\prec$'' to order these functions appropriately. Here $\log n$ stands for $\log_2 n$.
+    $$
+    \begin{array}{ccccc}
+        2^{\log n} \quad & \quad (\log n)^{\log n} \quad & \quad n^2 \quad & \quad n! \quad & \quad (n + 1)! \\
+        2^n \quad & \quad n^3 \quad & \quad \log^2 n \quad & \quad e^n \quad & \quad 2^{2^n} \\
+        \log\log n \quad & \quad n\cdot 2^n \quad & \quad n \quad & \quad \log n \quad & \quad 4^{\log n} \\
+    \end{array}
+    $$
+
+    \begin{solution}
+    	\hfill \break
+    	\begin{multline*}
+	    	\log \log n \prec \log n \prec \log^2 n \prec n = 2^{\log n} \prec \\ 
+	    	4^{\log n} = n^2 \prec n^3 \prec (\log n)^{\log n} \prec  2^n \prec \\
+			n \cdot 2^n \prec e^n \prec n! \prec (n + 1)! \prec 2^{2^n}
+    	\end{multline*}
+    	Explanations: \\
+    	\begin{itemize}
+    		\item
+    		$n^3 \prec (\log n)^{\log n} \prec  2^n$ \\
+    		\begin{gather*}
+    			\log n^3 = 3 \log n \\
+    			\log [(\log n)^{\log n}] = \log n (\log \log n) \\
+    			\log (2^n) = n 
+    		\end{gather*}
+    		
+    		\item 
+    		$n \cdot 2^n \prec e^n$ \\
+    		\[
+    			\lim_{n \to \infty} \frac{n \cdot 2^n}{e^n} = 
+    			\lim_{n \to \infty} \frac{n}{(\frac{e}{2})^n} = 0
+    		\]
+    		\item
+    		$e^n \prec n!$ \\
+    		Prove by induction since $k + 1 > e$ from some point $k_0$. 
+    		\item
+    		$(n + 1)! \prec 2^{2^n}$ \\
+    		Prove by induction since $2^{2^k} > k + 2$ from some point $k_0$. 
+    	\end{itemize}
+    	
+    	
+    \end{solution}
+
+\end{enumerate}
+
+\vspace{20pt}
+
+\textbf{Remark:} You need to include your .pdf and .tex files in your uploaded .rar or .zip file.
+
+%========================================================================
+\end{document}

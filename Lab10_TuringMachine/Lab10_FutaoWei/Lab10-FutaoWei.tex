@@ -1,0 +1,273 @@
+\documentclass[12pt,a4paper]{article}
+\usepackage{ctex}
+\usepackage{amsmath,amscd,amsbsy,amssymb,latexsym,url,bm,amsthm}
+\usepackage{epsfig,graphicx,subfigure}
+\usepackage{enumitem,balance}
+\usepackage{wrapfig}
+\usepackage{mathrsfs,euscript}
+\usepackage[usenames]{xcolor}
+\usepackage{hyperref}
+\usepackage[vlined,ruled,linesnumbered]{algorithm2e}
+\usepackage{float}
+\usepackage{multirow}
+
+\hypersetup{colorlinks=true,linkcolor=blue}
+
+\newtheorem{theorem}{Theorem}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{exercise}{Exercise}
+\newtheorem*{solution}{Solution}
+\newtheorem{definition}{Definition}
+\theoremstyle{definition}
+
+\graphicspath{/Users/weifutao/Desktop/Algorithm_and_Complexity/Labs/Lab10_TuringMachine}
+
+\renewcommand{\thefootnote}{\fnsymbol{footnote}}
+
+\newcommand{\postscript}[2]
+ {\setlength{\epsfxsize}{#2\hsize}
+  \centerline{\epsfbox{#1}}}
+
+\renewcommand{\baselinestretch}{1.0}
+
+\setlength{\oddsidemargin}{-0.365in}
+\setlength{\evensidemargin}{-0.365in}
+\setlength{\topmargin}{-0.3in}
+\setlength{\headheight}{0in}
+\setlength{\headsep}{0in}
+\setlength{\textheight}{10.1in}
+\setlength{\textwidth}{7in}
+\makeatletter \renewenvironment{proof}[1][Proof] {\par\pushQED{\qed}\normalfont\topsep6\p@\@plus6\p@\relax\trivlist\item[\hskip\labelsep\bfseries#1\@addpunct{.}]\ignorespaces}{\popQED\endtrivlist\@endpefalse} \makeatother
+\makeatletter
+\renewenvironment{solution}[1][Solution] {\par\pushQED{\qed}\normalfont\topsep6\p@\@plus6\p@\relax\trivlist\item[\hskip\labelsep\bfseries#1\@addpunct{.}]\ignorespaces}{\popQED\endtrivlist\@endpefalse} \makeatother
+
+\begin{document}
+\noindent
+
+%========================================================================
+\noindent\framebox[\linewidth]{\shortstack[c]{
+\Large{\textbf{Lab10-Turing Machine}}\vspace{1mm}\\
+Algorithm and Complexity (CS214), Xiaofeng Gao, Spring 2020.}}
+\begin{center}
+\footnotesize{\color{red}$*$ If there is any problem, please contact TA Yiming Liu. }
+
+\footnotesize{\color{blue}$*$ Name: Futao Wei  \quad Student ID: 518021910750 \quad Email: weifutao2019@gmail.com}
+\end{center}
+
+\begin{enumerate}
+
+\item
+Design a one-tape TM $M$ that computes the function $f(x, y) = x \mod y$, where $x$ and $y$ are positive integers ($x > y$). The alphabet is $\{1, 0, \Box, \triangleright, \triangleleft\}$, and the inputs are $x$ 1's, $\Box$ and $y$ 1's. Below is the initial configuration for input $x=7$ and $y=3$. The result $z=f(x, y)$ should also be represented in the form of $z$ 1's on the tape with the pattern of $\triangleright 111 \cdots 111 \triangleleft$.
+\begin{center}
+	\begin{tabular}{ll|c|c|c|c|c|c|c|c|c|c|c|c|c|c}
+		& \multicolumn{14}{c}{Initial Configuration}\\[5pt]
+		\cline{2-16}
+		& & $\triangleright$ &  1  & 1 & 1 & 1 & 1 & 1 & 1 & $\Box$ & 1 & 1 & 1 & $ \triangleleft$ & \\
+		\cline{2-16}
+		\multicolumn{2}{c}{} & \multicolumn{1}{c}{$\uparrow$} & \multicolumn{11}{c}{}\\[-4pt]
+		\multicolumn{2}{c}{} & \multicolumn{1}{c}{$q_S$} & \multicolumn{11}{c}{}	
+	\end{tabular}
+\end{center}
+
+\begin{enumerate}
+	\item
+	Please describe your design and then write the specifications of $M$ in the form like $\langle q_S, \triangleright \rangle \rightarrow \langle q_1, \triangleright,  R\rangle$. Explain the transition functions in detail.
+	
+	\item
+	Please draw the state transition diagram.
+	
+	\item
+	Show briefly and clearly the whole process from initial to final configurations for input $x = 7$ and $y = 3$. You may start like this:
+	$$(q_s,\underline{\triangleright}  1  1  1  1  1  1  1  \Box 1  1  1   \triangleleft)
+	\vdash (q_1,\triangleright  \underline{1}  1  1  1  1  1  1  \Box 1  1  1   \triangleleft)
+	\vdash^* (q_1,\triangleright  1  1  1  1  1  1  1  \underline{\Box} 1  1  1   \triangleleft)
+	\vdash (q_2,\triangleright  1  1  1  1  1  1  1  \Box \underline{1}  1  1   \triangleleft)$$
+	
+	\par{\color{blue}(Note that for simplicity, we write $(q_1,\triangleright  \underline{1}  1  1  1  1  1  1  \Box 1  1  1   \triangleleft)\vdash^* (q_1,\triangleright  1  1  1  1  1  1  1  \underline{\Box} 1  1  1   \triangleleft)$ if the corresponding transaction repeats on multiple inputs with the same state.)}
+	
+\end{enumerate}
+\begin{solution}
+	\hfill
+	\begin{enumerate}
+		\item 
+		To compute the function $f(x,y)$, we're going to decrement $x$ and $y$ by $1$ repeatedly. When $y$ turns $0$, we'll recover it to the initial value $y_0$. When $x$ finally turns $0$ with the current value of $y$ being $y^{\prime}$, we can obtain $f(x,y) = y_0 - y^{\prime}$. The following is the specifications of $M$. \\
+		Start: trivial
+		\[\langle q_S,\triangleright\rangle\rightarrow\langle q_1,\triangleright,R\rangle\]
+		Step 1: $x \leftarrow x-1$ until $x = 0$
+		\begin{gather*}
+			\langle q_1,1\rangle\rightarrow\langle q_2,\triangleright,R\rangle \\
+			\langle q_1,\Box\rangle\rightarrow\langle q_6,\triangleright,R\rangle
+		\end{gather*}
+		Step 2: move to $y$ part on the tape
+		\begin{gather*}
+			\langle q_2,1\rangle\rightarrow\langle q_2,1,R\rangle \\
+			\langle q_2,\Box\rangle\rightarrow\langle q_3,\Box,R\rangle
+		\end{gather*}
+		Step 3: skip the $0$'s; $y \leftarrow y-1$ until $y=0$
+		\begin{gather*}
+			\langle q_3,0\rangle\rightarrow\langle q_3,0,R\rangle \\
+			\langle q_3,1\rangle\rightarrow\langle q_4,0,L\rangle \\
+			\langle q_3,\triangleleft\rangle\rightarrow\langle q_5,\triangleleft,L\rangle 
+		\end{gather*}
+		
+		Step 4: move back to $x$ part on the tape
+		\begin{gather*}
+			\langle q_4,0\rangle\rightarrow\langle q_4,0,L\rangle \\
+			\langle q_4,\Box\rangle\rightarrow\langle q_4,\Box,L\rangle \\
+			\langle q_4,1\rangle\rightarrow\langle q_4,1,L\rangle \\
+			\langle q_4,\triangleright\rangle\rightarrow\langle q_1,\triangleright,R\rangle
+		\end{gather*}
+		Step 5: recover $y_0$ $1$'s when $y=0$
+		\begin{gather*}
+		\langle q_5,0\rangle\rightarrow\langle q_5,1,L\rangle \\
+		\langle q_5,\Box\rangle\rightarrow\langle q_3,\Box,R\rangle
+		\end{gather*}
+		End: write down the result
+		\begin{gather*}
+			\langle q_6,0\rangle\rightarrow\langle q_6,1,R\rangle \\
+			\langle q_6,1\rangle\rightarrow\langle q_H,\triangleleft,S\rangle
+		\end{gather*}
+		\item
+		\hfill \break
+		\includegraphics[scale=0.5]{state_trans}
+		\item
+		\hfill \break
+		\includegraphics[scale=0.22]{sol_1c}
+	\end{enumerate}
+\end{solution}
+
+\item Assume there's a Turing Machine $M$ using alphabet $\Gamma :\{ \triangleright, \Box, a, b, \cdots, z\}$. We can simulate $M$ by a Turing Machine $\tilde{M}$ using alphabet $\tilde{\Gamma }:\{ \triangleright, \Box, 0, 1\}$. Please transform the instruction $\langle q, i \rangle \rightarrow \langle q',j, R\rangle$ in $M$ into its corresponding form in $\tilde{M}$.
+\begin{solution}
+	We can represent the $26$ letters with a sequence of $0$'s and $1$'s whose length is 5. For generality, denote $i$ as $a_{i1}a_{i2}a_{i3}a_{i4}a_{i5}$ and $j$ as $a_{j1}a_{j2}a_{j3}a_{j4}a_{j5}$, where $a_k \in \{0, 1\}$. The following is the corresponding instructions. \\
+	Step 1: read the sequence denoting $i$
+	\begin{gather*}
+		\langle q, a_{i1} \rangle \rightarrow \langle q_1, a_{i1},  R\rangle \\
+		\langle q_1, a_{i2} \rangle \rightarrow \langle q_2, a_{i2},  R\rangle \\
+		\langle q_2, a_{i3} \rangle \rightarrow \langle q_3, a_{i3},  R\rangle \\
+		\langle q_3, a_{i4} \rangle \rightarrow \langle q_4, a_{i4},  R\rangle
+	\end{gather*}
+	Step 2: return to the start
+	\begin{gather*}
+		\langle q_4, a_{i5} \rangle \rightarrow \langle q_5, a_{i5},  L\rangle \\
+		\langle q_5, a_{i4} \rangle \rightarrow \langle q_6, a_{i4},  L\rangle \\
+		\langle q_6, a_{i3} \rangle \rightarrow \langle q_7, a_{i3},  L\rangle \\
+		\langle q_7, a_{i2} \rangle \rightarrow \langle q_8, a_{i2},  L\rangle 
+	\end{gather*}
+	Step 3: write the sequence denoting $j$
+	\begin{gather*}
+		\langle q_8, a_{i1} \rangle \rightarrow \langle q_9, a_{j1},  R\rangle \\
+		\langle q_9, a_{i2} \rangle \rightarrow \langle q_{10}, a_{j2},  R\rangle \\
+		\langle q_{10}, a_{i3} \rangle \rightarrow \langle q_{11}, a_{j3},  R\rangle \\
+		\langle q_{11}, a_{i4} \rangle \rightarrow \langle q_{12}, a_{j4},  R\rangle \\
+		\langle q_{12}, a_{i5} \rangle \rightarrow \langle q^{\prime}, a_{j5},  R\rangle
+	\end{gather*}
+\end{solution}
+
+\item \textbf{Wireless Data Broadcast System.}
+In a Wireless Data Broadcast System (WDBS), data items are repeatedly broadcasted in cycle on different channels. Denote $D = \{d_1, d_2,\cdots, d_k\}$ as data items, each $d_i$ with length $l_i$ (as time units), and $\mathbf{C}=\{C_1, C_2, \cdots, C_n\}$ as broadcasting channels. Fig.~\ref{Fig-Broadcast} illustrates a WDBS with 25 data items and 4 channels. Once a channel finishes broadcasting current cycle, it will repeat these data again as a new cycle. E.g., a possible broadcasting sequence of $C_1$ could be \{$d_6$, $d_{12}$, $d_1$, $d_{18}$, $d_7$, $d_6$, $d_{12}$, $d_1$, $d_{18}$, $d_7$, $\cdots$\}
+
+\begin{figure}[h]
+	\centering
+	\includegraphics[scale=1]{Fig-Broadcast.pdf}
+	\caption{An Example Scenario of Wireless Data Broadcast System.} \label{Fig-Broadcast}
+\end{figure}
+
+If a mobile client requires a subset of data items $D_q \subseteq D$ from this WDBS, he/she must access onto one channel, wait for the appearance of one required item, and switch to another channel if necessary. Each ``switch'' requires one time slot. For example, Lucien wants to download $\{d_1, d_3, d_5\}$, as shown in Fig.~\ref{Fig-Access}. He firstly accesses onto $C_1$ at time slot 1, then download $d_1$, $d_3$ respectively during time slots 2 to 5, and then switch to $C_3$ at time slot 6 (note that he cannot download $d_5$ from $C_2$ because of the switch constraint), and download $d_5$ during time slots 7 to 8. We define \emph{access latency} as the period when a client starts downloading, till the time he/she finishes. As a result, the overall access latency for Lucien is 7 in this example.
+
+\begin{figure}[!htbp]
+	\centering
+	\includegraphics[scale= 0.5]{Fig-Access.pdf}
+	\caption{An Example Scenario of Query of a Client.} \label{Fig-Access}
+\end{figure}
+
+Each operation (download/wait/switch) needs energy consumption. To conserve energy, a client hopes to use minimum amount of energy to download all required items in $D_q$, which means that he/she waits to minimize both access latency and switch numbers. Unfortunately, these two objectives conflict with each other naturally. Fig.~\ref{Fig-Conflict} exhibits such a scenario. To download $D_q=\{d_1, d_2, d_3, d_4\}$, if we start from $C_2$, in Option 1 we can switch to $C_1$ for $d_1$ immediately after downloading $d_3$, return back to $C_2$ for $d_4$, and to $C_1$ again for $d_2$. Such option costs 3 switches and 7 access latency. While in Option 2, we stay at $C_2$ lazily for $d_3$ and $d_4$, and then switch to $C_1$ for $d_2$ and $d_1$. Such option costs 1 switches and 12 access latency.
+
+
+\begin{figure}[!htbp]
+	\centering
+	\includegraphics[scale= 0.5]{Fig-Conflict.pdf}
+	\caption{Confliction between Access Latency and Switch Number.} \label{Fig-Conflict}
+\end{figure}
+
+Once we want to minimize two conflictive objectives simultaneously, we have three possible ways (similar as Segmented Least Squares told in Dynamic Programming Lecture). Now it is your turn to complete the formulation of this optimization, we name it as Minimum Constraint Data Retrieval Problem (MCDR), with the following sub-questions.
+\begin{enumerate}
+	\item If we add an additional switch parameter $h$, please define the MCDR (Version 1) completely as a search problem.
+	\item If we add an additional latency parameter $t$, please define the MCDR (Version 2) completely as a search problem.
+	\item If we set dimensional parameters $\alpha$ to switch number, and $\beta$ to access latency, we can combine two objectives together linearly as a new concept ``cost''. Please define the Minimum Cost Data Retrieval Problem (MCDR, Version 3) correspondingly.
+	\item Please give the decision versions of sub-questions (a), (b) and (c).
+\end{enumerate}
+\begin{solution}
+	\hfill \break
+	Input: 
+	\begin{itemize}
+		\item
+		Data item set $D = \{d_1, d_2,\cdots, d_k\}$, each $d_i$ with length $l_i$ as time units
+		\item
+		Broadcasting channel set $\mathbf{C}=\{C_1, C_2, \cdots, C_n\}$, each $C_i$ with data sequence $S_i$ to be repeatedly broadcasted
+		\item
+		Broadcasting starting time $t_i$ for each $C_i$, which is defined to obtain the time differences between two channels
+		\item
+		The data item set $D_q \subseteq D$, which is needed by the client
+	\end{itemize}
+
+	\begin{enumerate}
+		\item
+		Output (search version):
+		\begin{itemize}
+			\item
+			The minimum switch cost $h_{\text{min}}$
+			\item 
+			A legal sequence of $(C_k, d_k)$ denoting the order of downloading $d_k$ from $C_k$, which achieves the minimum switch cost $h_{\text{min}}$
+		\end{itemize}
+		Output (decision version):
+		\[
+			ans = 
+			\begin{cases}
+				1, \quad & \text{if } P \text{ is true} \\
+				0, \quad & \text{if } P \text{ is false}
+			\end{cases}
+		\]
+		where $P$: There exists a legal sequence of $(C_k, d_k)$ which achieves a switch cost less than $h_0$ (some specific value).
+		\item
+		Output (search version):
+		\begin{itemize}
+			\item
+			The minimum latency $t_{\text{min}}$
+			\item 
+			A legal sequence of $(C_k, d_k)$ denoting the order of downloading $d_k$ from $C_k$, which achieves the minimum latency $t_{\text{min}}$
+		\end{itemize}
+		Output (decision version):
+		\[
+		ans = 
+		\begin{cases}
+		1, \quad & \text{if } P \text{ is true} \\
+		0, \quad & \text{if } P \text{ is false}
+		\end{cases}
+		\]
+		where $P$: There exists a legal sequence of $(C_k, d_k)$ which achieves a latency less than $t_0$ (some specific value).
+		\item
+		Output (search version):
+		\begin{itemize}
+			\item
+			The minimum combinational cost $(\alpha h + \beta t)_{\text{min}}$
+			\item 
+			A legal sequence of $(C_k, d_k)$ denoting the order of downloading $d_k$ from $C_k$, which achieves the minimum combinational cost $(\alpha h + \beta t)_{\text{min}}$
+		\end{itemize}
+		Output (decision version):
+		\[
+		ans = 
+		\begin{cases}
+		1, \quad & \text{if } P \text{ is true} \\
+		0, \quad & \text{if } P \text{ is false}
+		\end{cases}
+		\]
+		where $P$: There exists a legal sequence of $(C_k, d_k)$ which achieves a combinational cost less than $\alpha h_0 + \beta t_0$ (some specific value).
+	\end{enumerate}
+\end{solution}
+
+\end{enumerate}
+
+%========================================================================
+\end{document}

@@ -1,0 +1,124 @@
+\documentclass[12pt,a4paper]{article}
+\usepackage{ctex}
+\usepackage{amsmath,amscd,amsbsy,amssymb,latexsym,url,bm,amsthm}
+\usepackage{epsfig,graphicx,subfigure}
+\usepackage{enumitem,balance}
+\usepackage{wrapfig}
+\usepackage{mathrsfs,euscript}
+\usepackage[usenames]{xcolor}
+\usepackage{hyperref}
+\usepackage[vlined,ruled,linesnumbered]{algorithm2e}
+\hypersetup{colorlinks=true,linkcolor=black}
+
+\newtheorem{theorem}{Theorem}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{exercise}{Exercise}
+\newtheorem*{solution}{Solution}
+\newtheorem{definition}{Definition}
+\theoremstyle{definition}
+
+\renewcommand{\thefootnote}{\fnsymbol{footnote}}
+
+\newcommand{\postscript}[2]
+ {\setlength{\epsfxsize}{#2\hsize}
+  \centerline{\epsfbox{#1}}}
+
+\renewcommand{\baselinestretch}{1.0}
+
+\setlength{\oddsidemargin}{-0.365in}
+\setlength{\evensidemargin}{-0.365in}
+\setlength{\topmargin}{-0.3in}
+\setlength{\headheight}{0in}
+\setlength{\headsep}{0in}
+\setlength{\textheight}{10.1in}
+\setlength{\textwidth}{7in}
+\makeatletter \renewenvironment{proof}[1][Proof] {\par\pushQED{\qed}\normalfont\topsep6\p@\@plus6\p@\relax\trivlist\item[\hskip\labelsep\bfseries#1\@addpunct{.}]\ignorespaces}{\popQED\endtrivlist\@endpefalse} \makeatother
+\makeatletter
+\renewenvironment{solution}[1][Solution] {\par\pushQED{\qed}\normalfont\topsep6\p@\@plus6\p@\relax\trivlist\item[\hskip\labelsep\bfseries#1\@addpunct{.}]\ignorespaces}{\popQED\endtrivlist\@endpefalse} \makeatother
+
+\begin{document}
+	\noindent
+	
+	%========================================================================
+	\noindent\framebox[\linewidth]{\shortstack[c]{
+	\Large{\textbf{Lab00-Proof}}\vspace{1mm}\\
+	CS214-Algorithm and Complexity, Xiaofeng Gao, Spring 2020.}}
+	\begin{center}
+		\footnotesize{\color{red}$*$ If there is any problem, please contact TA Yiming Liu.}
+		
+		% Please write down your name, student id and email.
+		\footnotesize{\color{blue}$*$ Name: Futao Wei  \quad Student ID: 518021910750 \quad Email: weifutao@sjtu.edu.cn}
+	\end{center}
+	
+	\begin{enumerate}
+	    \item
+	    Prove that for any integer $n>2$, there is a prime $p$ satisfying $n<p<n!$. {\color{blue}(Hint: consider a prime factor $p$ of $n!-1$ and prove by contradiction)}
+	    \begin{proof}
+			\hfill \break
+			Assume for the sake of contradiction that there exists an integer $k > 2$, such that there does not exist a prime $p$ satisfying $k < p < k!$. \\
+			In other words, for any integer $n$($k + 1 \leq n \leq k! - 1$), $n$ is a composite number. \\
+			For any integer $x$($2 \leq x \leq k$), $x \mid k!$. Therefore, $x \nmid k! - 1$. \\
+			Since $k! - 1$ is a composite number, there must exist a prime $p$($k + 1 \leq p < k! - 1$), such that $p \mid k! - 1$, which contradicts our assumption that ``For any integer $n$($k + 1 \leq n \leq k! - 1$), $n$ is a composite number." 
+	    	
+        \end{proof}
+	
+	    \item
+	    Use the minimal counterexample principle to prove that for any integer $n>17$, there exist integers $i_n\ge 0$ and $j_n\ge 0$, such that $n = i_n \times 4 + j_n \times 7$.
+	    \begin{proof}
+	    	\hfill \break
+	    	If $P(n)$ is not true for every $n > 17$, then there are values of $n$ for which $P(n)$ is false, and there must be a smallest such value, say $n = k$. \\
+	    	Since $18 = 1 \times 4 + 2 \times 7$,  $19 = 3 \times 4 + 1 \times 7$, $20 = 5 \times 4 + 0 \times 7$, $21 = 0 \times 4 + 3 \times 7$,we have $k \ge 22$ and $k - 4 \ge 18$. \\
+	    	Since $k$ is the smallest value for which $P(k)$ is false, $P(k - 4)$ is true. Thus there exist integers $i_{k - 4}\ge 0$ and $j_{k - 4}\ge 0$, such that $k - 4 = i_{k - 4} \times 4 + j_{k - 4} \times 7$. \\
+	    	However, we have 
+	    	\begin{align*}
+	    		k &= (k - 4) + 4\\
+	    		&= (i_{k - 1} \times 4 + j_{k - 1} \times 7) + 4\\
+	    		&= (i_{k - 1} + 1) \times 4 + j_{k - 1} \times 7
+	    	\end{align*}
+	    	We have derived a contradiction, which allows us to conclude our original assumption is false. 
+	    \end{proof}
+    
+	    \item
+	    Let $P=\{p_1, p_2, \cdots\}$ the set of all primes. Suppose that $\{p_i\}$ is monotonically    increasing, i.e., $p_1=2$, $p_2=3$, $p_3=5$, $\cdots$. Please prove: $p_n<2^{2^n}$. {\color{blue}(Hint: $p_i \nmid (1+\prod_{j=1}^n p_j), i=1,2,\cdots,n$.)}
+	    \begin{proof}
+	    	\hfill \break
+	    	Define $P(n)$ be the statement that ``$p_n < 2^{2^n}$". \\
+	    	\textbf{Basis step.} $P(1)$ is true, for $2 < 2^{2^1} = 4$. \\
+	    	\textbf{Induction hypothesis.} For $k \geq 1$ and $1 \leq n \leq k$, $P(n)$ is true, i.e., $p_n < 2^{2^n}$. \\
+	    	\textbf{Proof of induction step.} Let's prove $P(k + 1)$, i.e., $p_{k + 1} < 2^{2^{k + 1}}$. \\
+	    	Since 
+	    	\begin{align*}
+	    		p_i \nmid (1+\prod_{j=1}^k p_j), i=1,2,\cdots,k
+	    	\end{align*}
+	    	We have 
+    		\begin{align*}
+				p_{k + 1} \leq 1+\prod_{j=1}^k p_j < 1 + \prod_{j = 1}^k 2^{2^j} &= 1+ 2^{\sum_{j = 1}^{k} 2^j} \\
+				&= 1 + 2^{2^{k + 1} - 2} \\
+				&< 2^{2^{k + 1}}
+    		\end{align*}
+    		Thus $P(k + 1)$ is true. 
+	    \end{proof}
+	
+	    \item
+	    Prove that a plane divided by $n$ lines can be colored with only $2$ colors, and the adjacent regions have different colors.
+	    \begin{proof}
+	    	\hfill \break
+	    	Define $P(n)$ be the statement ``A plane divided by $n$ lines can be colored with only $2$ colors, and the adjacent regions have different colors." \\
+	    	\textbf{Basis step.} $P(0)$ is true. \\
+	    	\textbf{Induction hypothesis.} For $k \geq 0$, $P(k)$ is true. \\
+	    	\textbf{Proof of induction step.} Let's prove $P(k + 1)$. \\
+	    	We add another line onto the plane where $k$ lines already exist and all the regions have been colored properly. Then we recolor all the regions on one side of the new line with the opposite color. \\
+	    	In this way, no color conflict forms within either side of the new line. Meanwhile, conflicts on the newly formed border are settled. 
+	    	Thus $P(k + 1)$ is true. 
+	    \end{proof}
+	
+	\end{enumerate}
+	
+	\vspace{20pt}
+	
+	\textbf{Remark:} You need to include your .pdf and .tex files in your uploaded .rar or .zip file.
+	
+	%========================================================================
+\end{document}
